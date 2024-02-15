@@ -2,12 +2,11 @@
 
 #include "menu.h"
 #include "list.h"
-
 #include <iostream>
 
 
-
-
+sturctList<std::string> listString;
+sturctList<int> listInt;
 
 int main()
 {
@@ -22,13 +21,12 @@ int main()
 		switch (operation)
 		{
 		case 0:
-			//дестрой
 			return 0;
 		case 1: //int
-            processList(*listInt, countIntItems);
+            processList(listInt);
 			break;
 		case 2: //string
-			processList(*listString, countIntItems);
+			processList(listString);
 			break;
 		default:
 			break;

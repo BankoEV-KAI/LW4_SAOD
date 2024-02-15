@@ -1,195 +1,132 @@
-#include "list.h"
+п»ї#include "list.h"
 #include <iostream>
+#include <memory>
 
 
-//дописать элементы для отдельных типов 
-int countIntItems, countStringItems;
-list<int> listInt[listSize];
-list<std::string> listString[listSize];
+template bool isEmpty<int>(const sturctList<int>& listEx);
+template void printList<int>(sturctList<int>& listEx);
+template void addItem<int>(sturctList<int>& listEx, int newData);
+template void deleteItem<int>(sturctList<int>& listEx, int index);
+template void deleteItemByIndex<int>(sturctList<int>& listEx, int index);
+template void deleteItemByData<int>(sturctList<int>& listEx, int data);
+template int searchItem<int>(sturctList<int>& listEx, int data);
 
 
+template bool isEmpty<std::string>(const sturctList<std::string>& listEx);
+template void printList<std::string>(sturctList<std::string>& listEx);
+template void addItem<std::string>(sturctList<std::string>& listEx, std::string newData);
+template void deleteItem<std::string>(sturctList<std::string>& listEx, int index);
+template void deleteItemByIndex<std::string>(sturctList<std::string>& listEx, int index);
+template void deleteItemByData<std::string>(sturctList<std::string>& listEx, std::string data);
+template int searchItem<std::string>(sturctList<std::string>& listEx, std::string data);
 
-template<typename T>
-void initEmptyList() {
-    countIntItems = 0;
-    countStringItems = 0;
+template <typename T>
+bool isFull(const sturctList<T>& listEx) {
+	return listEx.count == listSize;
 }
 
 template <typename T>
-bool isInt(T dataItem) {
-    return false;
+bool isEmpty(const sturctList<T>& listEx) {
+	return listEx.count == 0;
 }
 
-template <>
-bool isInt<int>(int dataItem) {
-    return true;
-}
-
-template <>
-bool isInt<std::string>(std::string dataItem) {
-    return false;
-}
-
-
-template<typename T>
-bool isFull(list<T>& listEx) {
-    return isInt(&listEx.data) ? (countIntItems == listSize) : (countStringItems == listSize);
-}
-
-template<typename T>
-bool isEmpty(list<T>& listEx) {
-    return isInt(&listEx.data) ? (countIntItems == 0) : (countStringItems == 0);
-}
-
-template<typename T>
-void printDataList(list<T>& listEx) {
-    if (isEmpty<T>(listEx)) {
-        std::cout << " список пуст" << std::endl;
+template <typename T>
+void addItem(sturctList<T>& listEx, T newData) {
+    if (isFull(listEx)) {
+        std::cerr << "РЎРїРёСЃРѕРє РїРµСЂРµРїРѕР»РЅРµРЅ. Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° РЅРµРІРѕР·РјРѕР¶РЅРѕ." << std::endl;
         return;
     }
-    else if (isFull<T>(listEx)) {
-        std::cout << " список заполнен полностью. Элементы списка: (";
+    if (isEmpty(listEx)) {
+        listEx.data[0] = newData;
+        listEx.count++;
+        std::cout << "РЎРїРёСЃРѕРє РїСѓСЃС‚. Р­Р»РµРјРµРЅС‚ " << newData << " РґРѕР±Р°РІР»РµРЅ РІ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°." << listEx.count << std::endl;
+        return;
     }
-    int i{ 0 }; int countItems{ 0 };
-    T value = listEx.data;
-    isInt(&value) ? countItems = countIntItems : countItems = countStringItems;
-    while (i != countItems) {
-        std::cout << (T)listEx.data; 
-        if (i != countItems) {
-            std::cout << "; ";
+
+    for (int i{ 0 }; i < listEx.count; i++) {
+        if (listEx.data[i] > newData) {
+            for (int j{ listEx.count - 1 }; j >= i; j--) {
+                listEx.data[j + 1] = listEx.data[j];
+            }
+            listEx.data[i] = newData;
+            std::cout << "Р­Р»РµРјРµРЅС‚ " << newData << " РґРѕР±Р°РІР»РµРЅ РІ СЃРїРёСЃРѕРє. РќР° РїРѕР·РёС†РёСЋ " << i << " (РЅСѓРјРµСЂР°С†РёСЏ РїРѕР·РёС†РёР№ СЃ РЅСѓР»СЏ)" << std::endl;
+            listEx.count++;
+            return;
         }
-        i++;
     }
-    std::cout << "), количество элементов: " << countItems << "/" << listSize << std::endl;
+    listEx.data[listEx.count] = newData;
+    listEx.count++;
+    std::cout << "Р­Р»РµРјРµРЅС‚ " << newData << " РґРѕР±Р°РІР»РµРЅ РІ СЃРїРёСЃРѕРє. РќР° РїРѕР·РёС†РёСЋ " << listEx.count << " (РЅСѓРјРµСЂР°С†РёСЏ РїРѕР·РёС†РёР№ СЃ РЅСѓР»СЏ)" << std::endl;
+
 }
 
-template<typename T>
-void printStateList(list<T>& listEx) {
-    std::cout << "Состояние линейного списка: ";
-    if (!isEmpty<T>(listEx)) {
-        std::cout << "характеристики списка: ";
-        printDataList<T>(listEx);
+template <typename T>
+void deleteItem(sturctList<T>& listEx, int index) {
+    for (int j{ index }; j < listEx.count - 1; j++) {
+        listEx.data[j] = listEx.data[j + 1];
     }
-    else {
-        std::cout << "список пуст.";
-    }
+    listEx.count--;
 }
 
-template<typename T>
-int searchItem(T dataItem, list<T>& listEx) {
-    if (isEmpty<T>(listEx)) {
-        return -1;
+template <typename T>
+int searchItem(sturctList<T>& listEx, T searchData) {
+    if (isEmpty(listEx)) {
+        return -2;
     }
-    int countItems{ 0 };
-    isInt(listEx.data) ? countItems = countIntItems : countItems = countStringItems;
-    for (int i{ 0 }; i < countItems; i++) {
-        if (listEx[i].data == dataItem) {
+    for (int i{ 0 }; i < listEx.count; i++) {
+        if (listEx.data[i] == searchData) {
             return i;
         }
     }
     return -1;
 }
 
-template<typename T>
-void addItem(T dataItem) {
-    if (isFull<T>(listEx)) {
-        std::cout << "Список переполнен, добавление невозможно." << std::endl;
+template <typename T>
+void deleteItemByIndex(sturctList<T>& listEx, int index) {
+    if (0 <= index && index < listEx.count) {
+        std::cout << "Р‘С‹Р» СѓРґР°Р»РµРЅ СЌР»РµРјРµРЅС‚: "<< listEx.data[index] <<", СЂР°СЃРїРѕР»РѕР¶РµРЅРЅС‹Р№ РЅР° РїРѕР·РёС†РёРё: " << index  << std::endl;
+        deleteItem(listEx, index);
         return;
     }
-    if (isEmpty<T>(listEx)) {
-        listEx[0].data = dataItem;
-        std::cout << "Список был пуст, элемент был добавлен в начало списка. " << std::endl;
-        return;
-    }
-    int countItems{ 0 };
-    isInt(listEx.data) ? countItems = countIntItems : countItems = countStringItems;
-    for (int i{ 0 }; i < countItems; i++) {
-        if (dataItem < listEx[i].data) {
-            if (i == countItems - 1) {
-                listEx[i + 1].data = dataItem;
-            }
-            else {
-                for (int j{ countItems }; j > i; j--) { //сдвиг элементов
-                    listEx[j].data = listEx[j - 1].data;
-                }
-                listEx[i].data = dataItem;
-            }
-            std::cout << "Заданный элемент был добавлен на позицию: " << i << " (нумерация списка идет с нуля). " << std::endl;
-            printStateList<T>(listEx);
-        }
-    }
+    std::cerr << "РџРµСЂРµРґР°РЅ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РёРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р°. РЈРґР°Р»РµРЅРёРµ РЅРµ Р±РІР»Рѕ СЃРѕРІРµСЂС€РµРЅРѕ" << std::endl;
 }
 
-template<typename T>
-void deleteItem(T dataItem, list<T>& listEx) {
-    int index = searchItem<T>(dataItem, listEx);
-    int countItems{ 0 };
-    isInt(listEx.data) ? countItems = countIntItems : countItems = countStringItems;
+template <typename T>
+void deleteItemByData(sturctList<T>& listEx, T deletedData) {
+    int index = searchItem(listEx, deletedData);
+    if (index == -2) {
+        std::cout << "РЎРїРёСЃРѕРє РїСѓСЃС‚. РЈРґР°Р»РµРЅРёРµ РЅРµРІРѕР·РјРѕР¶РЅРѕ" << std::endl;
+        return;
+    }
     if (index == -1) {
-        std::cerr << "Error" << std::endl;
-    }
-    else {
-        for (int j{ index }; j < countItems; j++) {
-            listEx[j].data = listEx[j + 1].data;
-        }
-        std::cout << "Заданный элемент был удален с позиции: " << index << " (нумерация списка идет с нуля). " << std::endl;
-        printStateList<T>();
-    }
-}
-
-template bool isEmpty<int>(list<int>& listEx);
-template bool isEmpty<std::string>(list<std::string>& listEx);
-
-template bool isEmpty<int>(list<int>& listEx);
-template bool isEmpty<std::string>(list<std::string>& listEx);
-
-template void printDataList<int>(list<int>& listEx);
-template void printDataList<std::string>(list<std::string>& listEx);
-
-template void printStateList<int>(list<int>& listEx);
-template void printStateList<std::string>(list<std::string>& listEx);
-
-template <>
-void addItem<std::string>(std::string dataItem) {
-    
-    if (isFull(listString)) {
-        std::cerr << "Список переполнен, добавление невозможно." << std::endl;
+        std::cout << "Р—Р°РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РІ СЃРїРёСЃРєРµ. РЈРґР°Р»РµРЅРёРµ РЅРµРІРѕР·РјРѕР¶РЅРѕ" << std::endl;
         return;
     }
+    std::cout << "Р‘С‹Р» СѓРґР°Р»РµРЅ СЌР»РµРјРµРЅС‚: " << deletedData << ", СЂР°СЃРїРѕР»РѕР¶РµРЅРЅС‹Р№ РЅР° РїРѕР·РёС†РёРё: " << index << std::endl;
+    deleteItem(listEx, index);
+}
+
+
+template <typename T>
+void printList(sturctList<T>& listEx) {
     if (isEmpty(listEx)) {
-        listEx[0].data = dataItem;
-        std::cout << "Список был пуст, элемент был добавлен в начало списка. " << std::endl;
+        std::cout << "РЎРїРёСЃРѕРє РїСѓСЃС‚. " << std::endl;
         return;
     }
-    int countItems{ 0 };
-    isInt(&listEx.data) ? countItems = countIntItems : countItems = countStringItems;
-    for (int i{ 0 }; i < countItems; i++) {
-        if (dataItem < current -> data) {
-            if (i == countItems - 1) {
-\                listEx[i + 1].data = dataItem;
-            }
-            else {
-                for (int j{ countItems }; j > i; j--) { //сдвиг элементов
-                    listEx[j].data = listEx[j - 1].data;
-                }
-                listEx[i].data = dataItem;
-            }
-            std::cout << "Заданный элемент был добавлен на позицию: " << i << " (нумерация списка идет с нуля). " << std::endl;
-            printStateList<T>(listEx);
+    std::cout << "Р­Р»РµРјРµРЅС‚С‹ СЃРїРёСЃРєР°: (";
+    int i{ 0 };
+    while (i != listEx.count) {
+        std::cout << listEx.data[i];
+        if (i != listEx.count - 1) {
+            std::cout << "; ";
         }
+        i++;
     }
-}
-template <>
-void addItem<int>(int dataItem, list<int>& listEx) {
-    return;
+    std::cout << "), Р·Р°РїРѕР»РЅРµРЅРЅС‹Рµ РїРѕР·РёС†РёРё СЃРїРёСЃРєР° : " << listEx.count << "/" << listSize << std::endl;
 }
 
-template <>
-void deleteItem<std::string>(std::string dataItem, list<std::string>& listEx) {
-    return;
-}
-template <>
-void deleteItem<int>(int dataItem, list<int>& listEx) {
-    return;
-}
 
+
+
+template bool isFull<int>(const sturctList<int>& listEx);
+template bool isFull<std::string>(const sturctList<std::string>& listEx);

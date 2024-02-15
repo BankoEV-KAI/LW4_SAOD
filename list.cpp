@@ -33,7 +33,7 @@ bool isInt<std::string>(std::string dataItem) {
 
 template<typename T>
 bool isFull(list<T>& listEx) {
-    return isInt(listEx->data) ? (countIntItems == listSize) : (countStringItems == listSize);
+    return isInt(&listEx.data) ? (countIntItems == listSize) : (countStringItems == listSize);
 }
 
 template<typename T>
@@ -51,7 +51,8 @@ void printDataList(list<T>& listEx) {
         std::cout << " список заполнен полностью. Элементы списка: (";
     }
     int i{ 0 }; int countItems{ 0 };
-    isInt(listEx.data) ? countItems = countIntItems : countItems = countStringItems;
+    T value = listEx.data;
+    isInt(&value) ? countItems = countIntItems : countItems = countStringItems;
     while (i != countItems) {
         std::cout << (T)listEx.data; 
         if (i != countItems) {
@@ -65,7 +66,7 @@ void printDataList(list<T>& listEx) {
 template<typename T>
 void printStateList(list<T>& listEx) {
     std::cout << "Состояние линейного списка: ";
-    if (!isEmpty<T>()) {
+    if (!isEmpty<T>(listEx)) {
         std::cout << "характеристики списка: ";
         printDataList<T>(listEx);
     }
@@ -90,7 +91,7 @@ int searchItem(T dataItem, list<T>& listEx) {
 }
 
 template<typename T>
-void addItem(T dataItem, list<T>& listEx) {
+void addItem(T dataItem) {
     if (isFull<T>(listEx)) {
         std::cout << "Список переполнен, добавление невозможно." << std::endl;
         return;
@@ -139,41 +140,45 @@ void deleteItem(T dataItem, list<T>& listEx) {
 template bool isEmpty<int>(list<int>& listEx);
 template bool isEmpty<std::string>(list<std::string>& listEx);
 
-template <>
-bool isFull<std::string>(list<std::string>& listEx) {
-    return countStringItems == listSize;
-}
+template bool isEmpty<int>(list<int>& listEx);
+template bool isEmpty<std::string>(list<std::string>& listEx);
+
+template void printDataList<int>(list<int>& listEx);
+template void printDataList<std::string>(list<std::string>& listEx);
+
+template void printStateList<int>(list<int>& listEx);
+template void printStateList<std::string>(list<std::string>& listEx);
 
 template <>
-bool isFull<int>(list<int>& listEx) {
-    return countIntItems == listSize;
+void addItem<std::string>(std::string dataItem) {
+    
+    if (isFull(listString)) {
+        std::cerr << "Список переполнен, добавление невозможно." << std::endl;
+        return;
+    }
+    if (isEmpty(listEx)) {
+        listEx[0].data = dataItem;
+        std::cout << "Список был пуст, элемент был добавлен в начало списка. " << std::endl;
+        return;
+    }
+    int countItems{ 0 };
+    isInt(&listEx.data) ? countItems = countIntItems : countItems = countStringItems;
+    for (int i{ 0 }; i < countItems; i++) {
+        if (dataItem < current -> data) {
+            if (i == countItems - 1) {
+\                listEx[i + 1].data = dataItem;
+            }
+            else {
+                for (int j{ countItems }; j > i; j--) { //сдвиг элементов
+                    listEx[j].data = listEx[j - 1].data;
+                }
+                listEx[i].data = dataItem;
+            }
+            std::cout << "Заданный элемент был добавлен на позицию: " << i << " (нумерация списка идет с нуля). " << std::endl;
+            printStateList<T>(listEx);
+        }
+    }
 }
-
-template <>
-void printDataList<std::string>(list<std::string>& listEx) {
-    return;
-}
-
-template <>
-void printDataList<int>(list<int>& listEx) {
-    return;
-}
-
-template <>
-void printStateList<std::string>(list<std::string>& listEx) {
-    return;
-}
-
-template <>
-void printStateList<int>(list<int>& listEx) {
-    return;
-}
-
-template <>
-void addItem<std::string>(std::string dataItem, list<std::string>& listEx) {
-    return;
-}
-
 template <>
 void addItem<int>(int dataItem, list<int>& listEx) {
     return;
@@ -183,8 +188,8 @@ template <>
 void deleteItem<std::string>(std::string dataItem, list<std::string>& listEx) {
     return;
 }
-
 template <>
 void deleteItem<int>(int dataItem, list<int>& listEx) {
     return;
 }
+

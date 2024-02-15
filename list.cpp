@@ -1,6 +1,5 @@
 ﻿#include "list.h"
 #include <iostream>
-#include <memory>
 
 
 template bool isEmpty<int>(const sturctList<int>& listEx);
